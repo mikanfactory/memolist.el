@@ -51,7 +51,7 @@
 ;; interactive-function
 (defun memo-grep-category (category)
   (interactive "sInput category: ")
-  (ag-regexp (concat "tags:(.*)?" category "(.*)?") memolist-file-directory))
+  (ag-regexp (concat "categories:(.*)?" category "(.*)?") memolist-file-directory))
 
 ;; interactive-function
 (defun memo-new (title tags categories)
