@@ -4,11 +4,11 @@
 
 ;; Author: mikanfactory
 ;; URL: http://github.com/mikanfactory/emacs-memolist
-;; Version: 0.1
+;; Version: 0.2
 ;; Keywords: markdown, memo
-;; Package-Requires: ((markdown-mode "22.0") (ag "0.45"))
+;; URL: https://github.com/mikanfactory/emacs-memolist
 
-;;; License:
+;; Copyright (C) 2015 mikanfactory all rights reserved.
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -25,85 +25,116 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
-;; Code:
+;;; Commentary:
+;; 
+;; This program make markdown file in your `memolist-memo-directory' or
+;; search markdown file there. By default, `memolist-memo-directory' is
+;; set to "~/Memo" directory. If you would like to change it,
+;; use custom-set-valiables function like this.
+;; 
+;; (custom-set-variables '(memolist-memo-directory "/path/to/your/memo/directory"))
+;; 
 
+;;; Commands:
+;; `memo-show-list': Show markdown file which placed in `memolist-memo-directory'.
+;; `memo-grep': Search contents of markdown file by arg.
+;; `memo-grep-tag': Search tags in markdown file by arg.
+;; `memo-new': Create new markdown file in `memolist-memo-directory'.
+;; 
+
+;; Code:
 (require 'ag)
 (require 'markdown-mode)
 
-;; This package make markdown file in specified directory.
-(defvar memolist-file-directory "~/Memo")
+(defcustom memolist-memo-directory "~/Memo"
+  "This package make markdown file in specified directory."
+  :type 'string)
 
-;; interactive-function
+(defun exist-memolist-memo-directory? ()
+  "Check `memolist-memo-directory' is already exist or not."
+  (file-directory-p memolist-memo-directory))
+
 (defun memo-show-list ()
+  "Show markdown file which placed in `memolist-memo-directory'."
   (interactive)
-  (find-file memolist-file-directory))
+  (if (exist-memolist-memo-directory?)
+      (find-file memolist-memo-directory)
+      (message "Please create directory %s" memolist-memo-directory)))
 
-;; interactive-function
 (defun memo-grep (expr)
+  "Search contents of markdown file by `expr'."
   (interactive "sag: ")
-  (ag-regexp expr memolist-file-directory))
+  (if (exist-memolist-memo-directory?)
+      (ag-regexp expr memolist-memo-directory)
+      (message "Please create directory %s" memolist-memo-directory)))
 
-;; interactive-function
 (defun memo-grep-tag (tag)
+  "Search tags in markdown file by `tag'."
   (interactive "sInput tag: ")
-  (ag-regexp (concat "tags:(.*)?" tag "(.*)?") memolist-file-directory))
+  (if (exist-memolist-memo-directory?)
+      (ag-regexp (format "tags:(.*)?%s(.*)?" tag) memolist-memo-directory))
+      (message "Please create directory %s" memolist-memo-directory))
 
-;; interactive-function
-(defun memo-grep-category (category)
-  (interactive "sInput category: ")
-  (ag-regexp (concat "categories:(.*)?" category "(.*)?") memolist-file-directory))
+(defun memo-new (title tags)
+  "Create new markdown file in `memolist-memo-directory'.
+If already same file was created, ask whether overwrite it or edit it.
+And when same file does not exist, create new markdown file."
+  (interactive "sMemo title: \nsMemo tags: ")
+  (if (or (exist-memolist-memo-directory?) (init-directory?))
+      (if (file-exists-p (make-file-name title))
+          (overwrite-or-edit title tags)
+          (create-new-memo title tags))))
 
-;; interactive-function
-(defun memo-new (title tags categories)
-  (interactive "sMemo title: \nsMemo tags: \nsMemo categories: ")
-  (if (file-exists-p (make-file-name title))
-      (overwrite-or-edit title tags categories)
-      (create-new-memo title tags categories)))
-
-(defun overwrite-or-edit (title tags categories)
+(defun overwrite-or-edit (title tags)
+  "Ask overwrite or edit file."
   (let ((file (make-file-name title)))
     (if (y-or-n-p "The file already exists. Do you want to edit the file? ")
         (edit-memo file)
-        (overwrite-memo file tags categories))))
+        (overwrite-memo file tags))))
 
-(defun create-new-memo (title tags categories)
+(defun create-new-memo (title tags)
+  "Create new markdown file and insert header."
     (find-file (make-file-name title))
-    (write-header title tags categories))
+    (write-header title tags))
 
-(defun overwrite-memo (title tags categories)
+(defun overwrite-memo (title tags)
+  "Overwrite markdown file."
   (find-file (make-file-name title))
   (erase-buffer)
-  (write-header title tags categories))
+  (write-header title tags))
 
-(defun edit-memo (file) (find-file file))
+(defun edit-memo (file)
+  "Just open markdown file."
+  (find-file file))
 
-(defun write-header (title tags categories)
+(defun write-header (title tags)
+  "Insert headers."
   (progn
-    (insert (concat "title: " title "\n"))
+    (insert (format "title: %s\n"))
     (insert "===================\n")
-    (insert (concat "date: " (format-current-time)))
-    (insert (concat "tags: [" tags "]\n"))
-    (insert (concat "categories: [" categories "]\n"))
+    (insert (format "date: %s\n" (format-current-time)))
+    (insert (format "tags: [%s]\n" tags))
     (insert "- - - - - - - - - -\n\n")))
 
-;; String -> String
 (defun make-title (title)
-  (concat (format-time-string "%Y-%m-%d-"(current-time))
-          title
-          ".markdown"))
+  "Format title."
+  (format "%s-%s.markdown"
+          (format-time-string "%Y-%m-%d"(current-time)) title)) 
 
-;; String -> String
 (defun make-file-name (title)
-  (expand-file-name (make-title title) memolist-file-directory))
+  "Create full path of markdown file."
+  (expand-file-name (make-title title) memolist-memo-directory))
 
-;; Make directory if directory doesn't exist.
-(defun init-directory ()
-  (unless (file-directory-p memolist-file-directory)
-    (make-directory memolist-file-directory)))
+(defun init-directory? ()
+  (if (y-or-n-p (format "Create new directory in %s?" memolist-memo-directory))
+      (create-memo-directory)))
 
-(init-directory)
+(defun create-memo-directory ()
+  "Make new directory specified by `memolist-memo-directory'."
+  (make-directory memolist-memo-directory))
 
 (defun format-current-time ()
+  "Format current time."
   (format-time-string "%Y/%m/%d(%a) %H:%M:%S\n" (current-time)))
 
 (provide 'memolist)
