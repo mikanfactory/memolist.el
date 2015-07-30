@@ -32,8 +32,7 @@
 ;; 
 ;; (custom-set-variables '(memolist-memo-directory "/path/to/your/memo/directory"))
 ;; 
-
-;;; Commands:
+;; Commands:
 ;; `memo-show-list': Show markdown file which placed in `memolist-memo-directory'.
 ;; `memo-grep': Search contents of markdown file by arg.
 ;; `memo-grep-tag': Search tags in markdown file by arg.
