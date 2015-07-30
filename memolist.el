@@ -39,13 +39,20 @@
 ;; `memo-new': Create new markdown file in `memolist-memo-directory'.
 ;; 
 
-;; Code:
+;;; Code:
+
 (require 'ag)
 (require 'markdown-mode)
 
+(defgroup memolist nil
+  "memolist.el is Emacs port of memolist.vim."
+  :prefix "memolist"
+  :group 'memo)
+
 (defcustom memolist-memo-directory "~/Memo"
   "This package make markdown file in specified directory."
-  :type 'string)
+  :type 'string
+  :group 'memolist)
 
 (defun exist-memolist-memo-directory? ()
   "Check `memolist-memo-directory' is already exist or not."
@@ -84,10 +91,9 @@ And when same file does not exist, create new markdown file."
 
 (defun overwrite-or-edit (title tags)
   "Ask overwrite or edit file."
-  (let ((file (make-file-name title)))
-    (if (y-or-n-p "The file already exists. Do you want to edit the file? ")
-        (edit-memo file)
-        (overwrite-memo file tags))))
+  (if (y-or-n-p "The file already exists. Do you want to edit the file? ")
+      (edit-memo (make-file-name title))
+      (overwrite-memo title tags)))
 
 (defun create-new-memo (title tags)
   "Create new markdown file and insert header."
@@ -107,9 +113,9 @@ And when same file does not exist, create new markdown file."
 (defun write-header (title tags)
   "Insert headers."
   (progn
-    (insert (format "title: %s\n"))
+    (insert (format "title: %s\n" title))
     (insert "===================\n")
-    (insert (format "date: %s\n" (format-current-time)))
+    (insert (format "date: %s" (format-current-time)))
     (insert (format "tags: [%s]\n" tags))
     (insert "- - - - - - - - - -\n\n")))
 
