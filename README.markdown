@@ -11,3 +11,12 @@ memolist.el depends on a number of other modules, that you'll need to install, e
 + M-x memo-show-list: Show markdown which placed in `memolist-memo-directory`'.
 + M-x memo-grep: Search contents of markdown file by arg.
 + M-x memo-grep-tag: Search tags in markdown file by arg.
+
+##Option
+This program make markdown file in your `memolist-memo-directory` or
+search markdown file there. By default, `memolist-memo-directory` is
+set to "~/Memo" directory. If you would like to change it,
+use custom-set-valiables function like this.
+ 
+`(custom-set-variables '(memolist-memo-directory "/path/to/your/memo/directory"))`
+ 
