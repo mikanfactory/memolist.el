@@ -1,6 +1,6 @@
 #memolist.el
 memolist.el is Emacs port of [memolist.vim](https://github.com/glidenote/memolist.vim "memolist.vim"). Org-mode is
-very usuful and multifunction, but it is also hard to approach and coufuse with markdown. memolist.el offer you easy interface for writing and searching.
+very useful and multifunction, but it is also hard to approach and coufuse with markdown. memolist.el offer you easy interface for writing and searching.
 
 ##Dependencies
 memolist.el depends on a number of other modules, that you'll need to install, either manually or by way of Emacs package manager.
