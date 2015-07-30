@@ -1,14 +1,12 @@
-;;; memolist.el --- memolist.el is Emacs port of memolist.vim
-
-;; Copyright (c) 2015 mikanfactory 
-
-;; Author: mikanfactory
-;; URL: http://github.com/mikanfactory/emacs-memolist
-;; Version: 0.2
-;; Keywords: markdown, memo
-;; URL: https://github.com/mikanfactory/emacs-memolist
-
+;;; memolist.el --- memolist.el is Emacs port of memolist.vim.
+;; Author: mikanfactory <k952i4j14x17_at_gmail.com>
+;; Maintainer: mikanfactory
 ;; Copyright (C) 2015 mikanfactory all rights reserved.
+;; Created: :2015-03-01
+;; Version: 0.0.1
+;; Keywords: markdown, memo
+;; URL: http://github.com/mikanfactory/emacs-memolist
+;; Package-Requires: ((markdown-mode "22.0") (ag "0.45"))
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
