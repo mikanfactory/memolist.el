@@ -24,7 +24,6 @@
 ;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
-;; 
 ;; This program make markdown file in your `memolist-memo-directory' or
 ;; search markdown file there. By default, `memolist-memo-directory' is
 ;; set to "~/Memo" directory. If you would like to change it,
@@ -33,112 +32,112 @@
 ;; (custom-set-variables '(memolist-memo-directory "/path/to/your/memo/directory"))
 ;; 
 ;; Commands:
-;; `memo-show-list': Show markdown file which placed in `memolist-memo-directory'.
-;; `memo-grep': Search contents of markdown file by arg.
-;; `memo-grep-tag': Search tags in markdown file by arg.
-;; `memo-new': Create new markdown file in `memolist-memo-directory'.
+;; `memolist-show-list': Show markdown file which placed in `memolist-memo-directory'.
+;; `memolist-memo-grep': Search contents of markdown file by arg.
+;; `memolist-memo-grep-tag': Search tags in markdown file by arg.
+;; `memolist-memo-new': Create new markdown file in `memolist-memo-directory'.
 ;; 
 
 ;;; Code:
-
 (require 'ag)
 (require 'markdown-mode)
 
 (defgroup memolist nil
   "memolist.el is Emacs port of memolist.vim."
   :prefix "memolist"
-  :group 'memo)
+  :group 'convenience)
 
 (defcustom memolist-memo-directory "~/Memo"
   "This package make markdown file in specified directory."
   :type 'string
   :group 'memolist)
 
-(defun exist-memolist-memo-directory? ()
+(defun memolist-exist-memo-directory? ()
   "Check `memolist-memo-directory' is already exist or not."
   (file-directory-p memolist-memo-directory))
 
-(defun memo-show-list ()
-  "Show markdown file which placed in `memolist-memo-directory'."
-  (interactive)
-  (if (exist-memolist-memo-directory?)
-      (find-file memolist-memo-directory)
-      (message "Please create directory %s" memolist-memo-directory)))
+(defun memolist-create-memo-directory ()
+  "Make new directory specified by `memolist-memo-directory'."
+  (make-directory memolist-memo-directory))
 
-(defun memo-grep (expr)
-  "Search contents of markdown file by `expr'."
-  (interactive "sag: ")
-  (if (exist-memolist-memo-directory?)
-      (ag-regexp expr memolist-memo-directory)
-      (message "Please create directory %s" memolist-memo-directory)))
+(defun memolist-init-directory? ()
+  (when (y-or-n-p (format "Create new directory in %s?" memolist-memo-directory))
+    (memolist-create-memo-directory)
+    t))
 
-(defun memo-grep-tag (tag)
-  "Search tags in markdown file by `tag'."
-  (interactive "sInput tag: ")
-  (if (exist-memolist-memo-directory?)
-      (ag-regexp (format "tags:(.*)?%s(.*)?" tag) memolist-memo-directory))
-      (message "Please create directory %s" memolist-memo-directory))
-
-(defun memo-new (title tags)
-  "Create new markdown file in `memolist-memo-directory'.
-If already same file was created, ask whether overwrite it or edit it.
-And when same file does not exist, create new markdown file."
-  (interactive "sMemo title: \nsMemo tags: ")
-  (if (or (exist-memolist-memo-directory?) (init-directory?))
-      (if (file-exists-p (make-file-name title))
-          (overwrite-or-edit title tags)
-          (create-new-memo title tags))))
-
-(defun overwrite-or-edit (title tags)
-  "Ask overwrite or edit file."
+(defun memolist-overwrite-or-edit (title tags)
+  "Ask whethre overwrite or edit file."
   (if (y-or-n-p "The file already exists. Do you want to edit the file? ")
-      (edit-memo (make-file-name title))
-      (overwrite-memo title tags)))
+      (memolist-edit-memo (make-file-name title))
+    (memolist-overwrite-memo title tags)))
 
-(defun create-new-memo (title tags)
+(defun memolist-create-new-memo (title tags)
   "Create new markdown file and insert header."
-    (find-file (make-file-name title))
-    (write-header title tags))
+  (find-file (make-file-name title))
+  (memolist-write-header title tags))
 
-(defun overwrite-memo (title tags)
+(defun memolist-overwrite-memo (title tags)
   "Overwrite markdown file."
   (find-file (make-file-name title))
   (erase-buffer)
-  (write-header title tags))
+  (memolist-write-header title tags))
 
-(defun edit-memo (file)
+(defun memolist-edit-memo (file)
   "Just open markdown file."
   (find-file file))
 
-(defun write-header (title tags)
+(defun memolist-write-header (title tags)
   "Insert headers."
   (progn
     (insert (format "title: %s\n" title))
     (insert "===================\n")
-    (insert (format "date: %s" (format-current-time)))
+    (insert (format "date: %s" (memolist-format-current-time)))
     (insert (format "tags: [%s]\n" tags))
     (insert "- - - - - - - - - -\n\n")))
 
-(defun make-title (title)
+(defun memolist-make-title (title)
   "Format title."
   (format "%s-%s.markdown"
           (format-time-string "%Y-%m-%d"(current-time)) title)) 
 
-(defun make-file-name (title)
+(defun memolist-make-file-name (title)
   "Create full path of markdown file."
-  (expand-file-name (make-title title) memolist-memo-directory))
+  (expand-file-name (memolist-make-title title) memolist-memo-directory))
 
-(defun init-directory? ()
-  (if (y-or-n-p (format "Create new directory in %s?" memolist-memo-directory))
-      (create-memo-directory)))
-
-(defun create-memo-directory ()
-  "Make new directory specified by `memolist-memo-directory'."
-  (make-directory memolist-memo-directory))
-
-(defun format-current-time ()
+(defun memolist-format-current-time ()
   "Format current time."
   (format-time-string "%Y/%m/%d(%a) %H:%M:%S\n" (current-time)))
+
+(defun memolist-memo-new (title tags)
+  "Create new markdown file in `memolist-memo-directory'.
+If already same file was created, ask whether overwrite it or edit it.
+And when same file does not exist, create new markdown file."
+  (interactive "sMemo title: \nsMemo tags: ")
+  (if (or (memolist-exist-memo-directory?) (memolist-init-directory?))
+      (if (file-exists-p (make-file-name title))
+          (memolist-overwrite-or-edit title tags)
+        (memolist-create-new-memo title tags))))
+
+(defun memolist-show-list ()
+  "Show markdown file which placed in `memolist-memo-directory'."
+  (interactive)
+  (if (memolist-exist-memo-directory?)
+      (find-file memolist-memo-directory)
+    (message "Please create directory %s" memolist-memo-directory)))
+
+(defun memolist-memo-grep (expr)
+  "Search contents of markdown file by `expr'."
+  (interactive "sag: ")
+  (if (memolist-exist-memo-directory?)
+      (ag-regexp expr memolist-memo-directory)
+    (message "Please create directory %s" memolist-memo-directory)))
+
+(defun memolist-memo-grep-tag (tag)
+  "Search tags in markdown file by `tag'."
+  (interactive "sInput tag: ")
+  (if (memolist-exist-memo-directory?)
+      (ag-regexp (format "tags:(.*)?%s(.*)?" tag) memolist-memo-directory))
+  (message "Please create directory %s" memolist-memo-directory))
 
 (provide 'memolist)
 
