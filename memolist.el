@@ -142,4 +142,4 @@ And when same file does not exist, create new markdown file."
 
 (provide 'memolist)
 
-;; memolist.el ends here
+;;; memolist.el ends here
