@@ -108,6 +108,7 @@
   "Format current time."
   (format-time-string "%Y/%m/%d(%a) %H:%M:%S\n" (current-time)))
 
+;;;###autoload
 (defun memolist-memo-new (title tags)
   "Create new markdown file in `memolist-memo-directory'.
 If already same file was created, ask whether overwrite it or edit it.
@@ -118,6 +119,7 @@ And when same file does not exist, create new markdown file."
           (memolist-overwrite-or-edit title tags)
         (memolist-create-new-memo title tags))))
 
+;;;###autoload
 (defun memolist-show-list ()
   "Show markdown file which placed in `memolist-memo-directory'."
   (interactive)
@@ -125,6 +127,7 @@ And when same file does not exist, create new markdown file."
       (find-file memolist-memo-directory)
     (message "Please create directory %s" memolist-memo-directory)))
 
+;;;###autoload
 (defun memolist-memo-grep (expr)
   "Search contents of markdown file by `expr'."
   (interactive "sag: ")
@@ -132,6 +135,7 @@ And when same file does not exist, create new markdown file."
       (ag-regexp expr memolist-memo-directory)
     (message "Please create directory %s" memolist-memo-directory)))
 
+;;;###autoload
 (defun memolist-memo-grep-tag (tag)
   "Search tags in markdown file by `tag'."
   (interactive "sInput tag: ")
