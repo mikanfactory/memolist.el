@@ -68,17 +68,17 @@
 (defun memolist-overwrite-or-edit (title tags)
   "Ask whethre overwrite or edit file."
   (if (y-or-n-p "The file already exists. Do you want to edit the file? ")
-      (memolist-edit-memo (make-file-name title))
+      (memolist-edit-memo (memolist-make-file-name title))
     (memolist-overwrite-memo title tags)))
 
 (defun memolist-create-new-memo (title tags)
   "Create new markdown file and insert header."
-  (find-file (make-file-name title))
+  (find-file (memolist-make-file-name title))
   (memolist-write-header title tags))
 
 (defun memolist-overwrite-memo (title tags)
   "Overwrite markdown file."
-  (find-file (make-file-name title))
+  (find-file (memolist-make-file-name title))
   (erase-buffer)
   (memolist-write-header title tags))
 
@@ -115,7 +115,7 @@ If already same file was created, ask whether overwrite it or edit it.
 And when same file does not exist, create new markdown file."
   (interactive "sMemo title: \nsMemo tags: ")
   (if (or (memolist-exist-memo-directory?) (memolist-init-directory?))
-      (if (file-exists-p (make-file-name title))
+      (if (file-exists-p (memolist-make-file-name title))
           (memolist-overwrite-or-edit title tags)
         (memolist-create-new-memo title tags))))
 
