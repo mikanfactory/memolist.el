@@ -24,6 +24,11 @@
 ;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
+;; 
+;; memolist.el is Emacs port of memolist.vim. Org-mode is very useful and multifunction,
+;; but it is also hard to approach and coufuse with markdown. memolist.el offer you
+;; simple interface for writing and searching.
+;; 
 ;; This program make markdown file in your `memolist-memo-directory' or
 ;; search markdown file there. By default, `memolist-memo-directory' is
 ;; set to "~/Memo" directory. If you would like to change it,
